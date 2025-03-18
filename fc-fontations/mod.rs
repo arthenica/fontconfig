@@ -1,5 +1,7 @@
 extern crate fc_fontations_bindgen;
 
+mod pattern_bindings;
+
 use fc_fontations_bindgen::{
     fcint::{FcPatternCreate, FcPatternObjectAddBool},
     FcFontSet, FcFontSetAdd,
@@ -23,7 +25,7 @@ pub unsafe extern "C" fn add_patterns_to_fontset(
     // TODO(drott): This should be FC_COLOR_OBJECT imported from fcint.h,
     // but there's a separate bindgen issue that needs to be sorted out.
     const COLOR_OBJECT: i32 = 46;
-    FcPatternObjectAddBool(empty_pattern, COLOR_OBJECT, 0 as i32);
+    FcPatternObjectAddBool(empty_pattern, COLOR_OBJECT, 0_i32);
     if !font_set.is_null() {
         FcFontSetAdd(
             font_set,
