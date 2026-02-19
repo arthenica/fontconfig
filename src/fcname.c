@@ -540,30 +540,36 @@ FcNameUnparseValue (FcStrBuf *buf,
                     FcValue  *v0,
                     FcChar8  *escape)
 {
-    FcChar8 temp[1024];
+    const FcChar8 *s;
+    FcChar8 *p = NULL;
     FcValue v = FcValueCanonicalize (v0);
+    FcBool ret;
 
     switch (v.type) {
     case FcTypeUnknown:
     case FcTypeVoid:
 	return FcTrue;
     case FcTypeInteger:
-	sprintf ((char *)temp, "%d", v.u.i);
-	return FcNameUnparseString (buf, temp, 0);
+	p = FcStrDupFormat ("%d", v.u.i);
+	s = (const FcChar8 *)p;
+	break;
     case FcTypeDouble:
-	sprintf ((char *)temp, "%g", v.u.d);
-	return FcNameUnparseString (buf, temp, 0);
+        p = FcStrDupFormat ("%g", v.u.d);
+	s = (const FcChar8 *)p;
+	break;
     case FcTypeString:
-	return FcNameUnparseString (buf, v.u.s, escape);
+	s = v.u.s;
+	break;
     case FcTypeBool:
 	return FcNameUnparseString (buf,
 	                            v.u.b == FcTrue ? (FcChar8 *)"True" : v.u.b == FcFalse ? (FcChar8 *)"False"
 	                                                                                   : (FcChar8 *)"DontCare",
 	                            0);
     case FcTypeMatrix:
-	sprintf ((char *)temp, "%g %g %g %g",
-	         v.u.m->xx, v.u.m->xy, v.u.m->yx, v.u.m->yy);
-	return FcNameUnparseString (buf, temp, 0);
+	p = FcStrDupFormat ("%g %g %g %g",
+	                    v.u.m->xx, v.u.m->xy, v.u.m->yx, v.u.m->yy);
+	s = (const FcChar8 *)p;
+	break;
     case FcTypeCharSet:
 	return FcNameUnparseCharSet (buf, v.u.c);
     case FcTypeLangSet:
@@ -571,10 +577,16 @@ FcNameUnparseValue (FcStrBuf *buf,
     case FcTypeFTFace:
 	return FcTrue;
     case FcTypeRange:
-	sprintf ((char *)temp, "[%g %g]", v.u.r->begin, v.u.r->end);
-	return FcNameUnparseString (buf, temp, 0);
+	p = FcStrDupFormat ("[%g %g]", v.u.r->begin, v.u.r->end);
+	s = (const FcChar8 *)p;
+	break;
+    default:
+	return FcFalse;
     }
-    return FcFalse;
+    ret = FcNameUnparseString (buf, s, 0);
+    if (p)
+	FcStrFree (p);
+    return ret;
 }
 
 FcBool

@@ -25,8 +25,12 @@
 #include "fcint.h"
 
 #include <ctype.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#ifdef HAVE_XLOCALE_H
+#include <xlocale.h>
+#endif
 
 /* Objects MT-safe for readonly access. */
 
