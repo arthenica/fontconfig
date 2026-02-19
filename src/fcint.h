@@ -1564,6 +1564,9 @@ FcPrivate FcBool
 FcIsFsMtimeBroken (const FcChar8 *dir);
 
 /* fcstr.c */
+FcPrivate double
+FcStrtod (char *s, char **end);
+
 FcPrivate FcChar8 *
 FcStrDupVaFormat (const char *format, va_list va);
 

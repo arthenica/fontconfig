@@ -138,7 +138,6 @@ typedef FcChar8 *FC8;
 
 #include "fcconst.h"
 
-
 FcBool
 FcNameRegisterConstants (const FcConstant *consts, int nconsts)
 {
@@ -156,8 +155,8 @@ FcNameUnregisterConstants (const FcConstant *consts, int nconsts)
 static int
 FcNameFindConstant (const FcChar8 *string)
 {
-    int min, max;
-    int last = NUM_FC_CONST_SYMBOLS - 1;
+    int     min, max;
+    int     last = NUM_FC_CONST_SYMBOLS - 1;
     FcChar8 c = FcToLower (string[0]);
     FcChar8 b = FcToLower (_FcBaseConstantSymbols[0].name[0]);
     FcChar8 e = FcToLower (_FcBaseConstantSymbols[last - 1].name[0]);
@@ -191,7 +190,7 @@ FcNameGetConstant (const FcChar8 *string)
 	    fprintf (stderr, "Fontconfig error: the ambiguous constant name: %s: Use :<property name>=<keyword> instead of :<keyword>\n", string);
 	    return NULL;
 	} else {
-            return &_FcBaseConstantObjects[sym->values[0].idx_obj].values[sym->values[0].idx_variant];
+	    return &_FcBaseConstantObjects[sym->values[0].idx_obj].values[sym->values[0].idx_variant];
 	}
     }
     return NULL;
@@ -338,7 +337,7 @@ FcNameConvert (FcType type, const char *object, FcChar8 *string)
 	    v.u.b = FcFalse;
 	break;
     case FcTypeDouble:
-	v.u.d = strtod ((char *)string, 0);
+	v.u.d = FcStrtod ((char *)string, 0);
 	break;
     case FcTypeMatrix:
 	FcMatrixInit (&m);
@@ -375,7 +374,7 @@ FcNameConvert (FcType type, const char *object, FcChar8 *string)
 		if (FcNameConstantWithObjectCheck (string, o, &si)) {
 		    v.u.d = (double)si;
 		} else {
-		    v.u.d = strtod ((char *)string, &p);
+		    v.u.d = FcStrtod ((char *)string, &p);
 		    if (p != NULL && p[0] != 0)
 			v.type = FcTypeVoid;
 		}
@@ -454,7 +453,7 @@ FcNameParse (const FcChar8 *name)
     if (delim == '-') {
 	for (;;) {
 	    name = FcNameFindNext (name, "-,:", save, &delim);
-	    d = strtod ((char *)save, (char **)&e);
+	    d = FcStrtod ((char *)save, (char **)&e);
 	    if (e != save) {
 		if (!FcPatternObjectAddDouble (pat, FC_SIZE_OBJECT, d))
 		    goto bail2;
@@ -541,9 +540,9 @@ FcNameUnparseValue (FcStrBuf *buf,
                     FcChar8  *escape)
 {
     const FcChar8 *s;
-    FcChar8 *p = NULL;
-    FcValue v = FcValueCanonicalize (v0);
-    FcBool ret;
+    FcChar8       *p = NULL;
+    FcValue        v = FcValueCanonicalize (v0);
+    FcBool         ret;
 
     switch (v.type) {
     case FcTypeUnknown:
@@ -554,7 +553,7 @@ FcNameUnparseValue (FcStrBuf *buf,
 	s = (const FcChar8 *)p;
 	break;
     case FcTypeDouble:
-        p = FcStrDupFormat ("%g", v.u.d);
+	p = FcStrDupFormat ("%g", v.u.d);
 	s = (const FcChar8 *)p;
 	break;
     case FcTypeString:

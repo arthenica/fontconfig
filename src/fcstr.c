@@ -34,6 +34,68 @@
 
 /* Objects MT-safe for readonly access. */
 
+/*
+ * idea copied from glib g_ascii_strtod with
+ * permission of the author (Alexander Larsson)
+ */
+
+double
+FcStrtod (char *s, char **end)
+{
+#ifndef __BIONIC__
+    struct lconv *locale_data;
+#endif
+    const char *decimal_point;
+    int         dlen;
+    char       *dot;
+    double      v;
+
+    /*
+     * Have to swap the decimal point to match the current locale
+     * if that locale doesn't use 0x2e
+     */
+#ifndef __BIONIC__
+    locale_data = localeconv();
+    decimal_point = locale_data->decimal_point;
+    dlen = strlen (decimal_point);
+#else
+    decimal_point = ".";
+    dlen = 1;
+#endif
+
+    if ((dot = strchr (s, 0x2e)) &&
+        (decimal_point[0] != 0x2e ||
+         decimal_point[1] != 0)) {
+	char buf[128];
+	int  slen = strlen (s);
+
+	if (slen + dlen > (int)sizeof (buf)) {
+	    if (end)
+		*end = s;
+	    v = 0;
+	} else {
+	    char *buf_end;
+	    /* mantissa */
+	    strncpy (buf, s, dot - s);
+	    /* decimal point */
+	    strcpy (buf + (dot - s), decimal_point);
+	    /* rest of number */
+	    strcpy (buf + (dot - s) + dlen, dot + 1);
+	    buf_end = 0;
+	    v = strtod (buf, &buf_end);
+	    if (buf_end) {
+		buf_end = s + (buf_end - buf);
+		if (buf_end > dot)
+		    buf_end -= dlen - 1;
+	    }
+	    if (end)
+		*end = buf_end;
+	}
+    } else
+	v = strtod (s, end);
+    return v;
+}
+
 FcChar8 *
 FcStrCopy (const FcChar8 *s)
 {
@@ -41,11 +103,11 @@ FcStrCopy (const FcChar8 *s)
     return (FcChar8 *)strdup ((const char *)s);
 #else
     FcChar8 *ret;
-    size_t len = strlen ((const char *)s) + 1;
+    size_t   len = strlen ((const char *)s) + 1;
 
     ret = malloc (len);
     if (!ret)
-        return NULL;
+	return NULL;
 
     return memcpy (ret, s, len);
 #endif
@@ -65,7 +127,7 @@ FcChar8 *
 FcStrDupFormat (const char *format, ...)
 {
     va_list va;
-    char *ret = NULL;
+    char   *ret = NULL;
 
     va_start (va, format);
     FcStrDupVapFormat (ret, format, va);
@@ -947,7 +1009,7 @@ FcBool
 FcStrBufFormat (FcStrBuf *buf, const char *format, ...)
 {
     va_list va;
-    FcBool ret;
+    FcBool  ret;
 
     va_start (va, format);
     FcStrBufVapFormat (ret, buf, format, va);
