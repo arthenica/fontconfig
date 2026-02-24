@@ -495,11 +495,15 @@ FcConfigAddCache (FcConfig *config, FcCache *cache,
 
 	    if (relocated) {
 		FcChar8 *base = FcStrBasename (dir);
-		dir = s = FcStrBuildFilename (forDir, base, NULL);
+		FcChar8 *p;
+		p = FcStrBuildFilename (forDir, base, NULL);
+		dir = s = FcStrCopyFilename (p);
+		FcStrFree (p);
 		FcStrFree (base);
 	    }
-	    if (FcConfigAcceptFilename (config, dir))
-		FcStrSetAddFilename (dirSet, dir);
+	    if (FcConfigAcceptFilename (config, dir)) {
+		FcStrSetAddTriple (dirSet, dir, NULL, NULL);
+	    }
 	    if (s)
 		FcStrFree (s);
 	}
