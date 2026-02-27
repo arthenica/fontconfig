@@ -751,7 +751,6 @@ FcFontRenderPrepare (FcConfig  *config,
 	         fe->object == FC_WIDTH_OBJECT ||
 	         fe->object == FC_SIZE_OBJECT)) {
 		double      num;
-		FcChar8     temp[128];
 		const char *tag = "    ";
 
 		assert (v.type == FcTypeDouble);
@@ -772,23 +771,7 @@ FcFontRenderPrepare (FcConfig  *config,
 		    tag = "opsz";
 		    break;
 		}
-#ifdef _WIN32
-		{
-		    _locale_t loc = _create_locale (LC_NUMERIC, "C");
-		    _sprintf_l ((char *)temp, "%4s=%g", loc, tag, num);
-		    _free_locale (loc);
-		}
-#else
-		{
-		    locale_t loc;
-		    loc = newlocale (LC_NUMERIC_MASK, "POSIX", (locale_t)0);
-		    uselocale (loc);
-		    sprintf ((char *)temp, "%4s=%g", tag, num);
-		    uselocale (LC_GLOBAL_LOCALE);
-		    freelocale (loc);
-		}
-#endif
-		FcStrBufString (&variations, temp);
+		FcStrBufFormat (&variations, "%4s=%g", tag, num);
 	    }
 	} else {
 	    FcPatternObjectListAdd (newp, fe->object,

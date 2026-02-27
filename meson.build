@@ -116,6 +116,7 @@ check_headers = [
   ['sys/mount.h'],
   ['time.h'],
   ['wchar.h'],
+  ['xlocale.h'],
 ]
 
 check_funcs = [
@@ -139,9 +140,12 @@ check_funcs = [
   ['strerror'],
   ['strerror_r'],
   ['mmap'],
+  ['vasprintf_l'],
   ['vasprintf'],
   ['vprintf'],
   ['vsnprintf'],
+  ['_vsnprintf_l'],
+  ['_vsnprintf_l', {'prefix': '#include <stdio.h>'}],
   ['vsprintf'],
   ['getpagesize'],
   ['getpid'],
@@ -263,8 +267,9 @@ foreach check : check_funcs
   name = check[0]
   opts = check.length() > 1 ? check[1] : {}
   extra_deps = opts.get('dependencies', [])
+  prefix = opts.get('prefix', '')
 
-  if cc.has_function(name, dependencies: extra_deps)
+  if cc.has_function(name, dependencies: extra_deps, prefix: prefix)
     conf.set('HAVE_@0@'.format(name.to_upper()), 1)
   endif
 endforeach
