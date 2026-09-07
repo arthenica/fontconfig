@@ -222,7 +222,14 @@ class Build:
             self._log(line, end="")
 
         proc.wait()
-        return subprocess.CompletedProcess(args, proc.returncode)
+        ret = subprocess.CompletedProcess(args, proc.returncode)
+        if self.builddir.exists():
+            cfile = self.builddir / "CACHEDIR.TAG"
+            cfile.write_text("Signature: 8a477f597d28d172789f06886806bc55")
+        if self.prefix.exists():
+            cfile = self.prefix / "CACHEDIR.TAG"
+            cfile.write_text("Signature: 8a477f597d28d172789f06886806bc55")
+        return ret
 
     def _run_shell_script(
         self,
@@ -476,6 +483,9 @@ def ensure_venv(skip_venv=False):
             != 0
         ):
             sys.exit("Error: venv creation failed")
+    (venv_path / "CACHEDIR.TAG").write_text(
+        "Signature: 8a477f597d28d172789f06886806bc55"
+    )
 
     venv_bin, venv_python, venv_pip = get_venv_paths(venv_path)
 
