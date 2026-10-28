@@ -889,6 +889,7 @@ FcCacheIsNewVersion (FcConfig *config, FcCache *cache)
 }
 
 static int64_t FcDirMtime (struct stat *statb);
+static int64_t FcDirChecksumNano (struct stat *statb);
 static int64_t FcCacheGetChecksum (FcCache *cache);
 
 static FcBool
@@ -913,23 +914,23 @@ FcCacheTimeValid (FcConfig *config, FcCache *cache, struct stat *dir_stat)
 	dir_stat = &dir_static;
     }
 #ifdef HAVE_STRUCT_STAT_ST_MTIM
-    fnano = (cache->checksum_nano == dir_stat->st_mtim.tv_nsec);
+    fnano = (cache->checksum_nano == FcDirChecksumNano (dir_stat));
     if (FcDebug() & FC_DBG_CACHE)
 	printf ("FcCacheTimeValid dir \"%s\" cache checksum %" PRIi64 ".%ld dir checksum %" PRIi64 ".%ld\n",
 	        FcCacheDir (cache),
 	        FcCacheGetChecksum (cache),
 	        (long)cache->checksum_nano,
-	        (int64_t)dir_stat->st_mtime, dir_stat->st_mtim.tv_nsec);
+	        FcDirMtime (dir_stat), (long)FcDirChecksumNano (dir_stat));
 #else
     if (FcDebug() & FC_DBG_CACHE)
 	printf ("FcCacheTimeValid dir \"%s\" cache checksum %" PRIi64 " dir checksum %" PRIi64 "\n",
 	        FcCacheDir (cache),
 	        FcCacheGetChecksum (cache),
-	        (int64_t)dir_stat->st_mtime);
+	        FcDirMtime (dir_stat));
 #endif
     {
 	int64_t cache_mtime = FcCacheGetChecksum (cache);
-	return dir_stat->st_mtime == 0 || (cache_mtime == (int64_t)dir_stat->st_mtime && fnano);
+	return dir_stat->st_mtime == 0 || (cache_mtime == FcDirMtime (dir_stat) && fnano);
     }
 }
 
