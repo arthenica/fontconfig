@@ -13,6 +13,8 @@ def fctest():
 def generate_cache(fctest, cs_ref=-1, cs_num=1, leaves_offset_val=None, numbers_offset_val=None, leaf_val=None, invalid_cs_ptr=False):
     font_dir = fctest.fontdir.name
     out_dir = fctest.cachedir.name
+    # The header below stores the raw mtime. Do not clamp with SOURCE_DATE_EPOCH
+    fctest.env.pop('SOURCE_DATE_EPOCH', None)
 
     dir_bytes = font_dir.encode() + b"\x00"
     fam_bytes = b"TestMatchFontName\x00"
