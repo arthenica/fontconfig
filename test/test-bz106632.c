@@ -171,6 +171,10 @@ main (void)
     FcFontSet *fs;
     FcPattern *pat;
 
+    /* This test depends on the directory mtime changing.
+     * SOURCE_DATE_EPOCH would clamp it and hide the change. */
+    unsetenv ("SOURCE_DATE_EPOCH");
+
     fprintf (stderr, "D: Creating tmp dir\n");
     basedir = fc_mkdtemp (template);
     if (!basedir) {

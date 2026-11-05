@@ -137,6 +137,8 @@ def generate_cache(
 
 def generate_standalone_cache(fctest, **kwargs):
     """Craft a cache file under a name fontconfig will not regenerate."""
+    # The header stores the raw mtime. Do not clamp with SOURCE_DATE_EPOCH
+    fctest.env.pop('SOURCE_DATE_EPOCH', None)
     return generate_cache(
         fctest.fontdir.name,
         os.path.join(fctest.cachedir.name, "invalid_cache_file"),

@@ -192,6 +192,8 @@ def test_gen_testcache(fctest, fcfont):
         if not testexe.exists():
             raise RuntimeError('No test case for gen-testcache')
 
+    # This test case depends on the timestamp. Do not fix with SOURCE_DATE_EPOCH
+    fctest.env.pop('SOURCE_DATE_EPOCH', None)
     fctest.setup()
     fctest.install_font(fcfont.fonts, '.')
     for ret, stdout, stderr in fctest.run(testexe, [fctest.fontdir.name]):
@@ -233,6 +235,8 @@ def test_gen_testcache_no_check(fctest, fcfont):
         if not testexe.exists():
             raise RuntimeError('No test case for gen-testcache')
 
+    # This test case depends on the timestamp. Do not fix with SOURCE_DATE_EPOCH
+    fctest.env.pop('SOURCE_DATE_EPOCH', None)
     fctest.env['FONTCONFIG_NO_CHECK_CACHE_VERSION'] = '1'
     fctest.setup()
     fctest.install_font(fcfont.fonts, '.')
